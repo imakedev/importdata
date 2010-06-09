@@ -1,0 +1,6 @@
+##################### VW_TOPIC ##########################
+select t.*, p.post_username, pt.post_subject, pt.post_text, u.username from ib_topics t join ib_posts p on t.topic_first_post_id = p.post_id join ib_posts_text pt on p.post_id=pt.post_id join ib_users u on t.topic_poster=u.user_id
+
+##################### VW_REPLY ##########################
+select * from vw_reply_message where post_id not in (select topic_first_post_id from ib_topics)
+

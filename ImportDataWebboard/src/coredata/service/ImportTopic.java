@@ -47,7 +47,7 @@ public class ImportTopic {
 					userid, password);
 
 			System.out.println(conn);
-			String cmd = "select v.*, FROM_UNIXTIME(topic_time) as frang from Vw_Topic v";
+			String cmd = "select v.*, FROM_UNIXTIME(topic_time) as frang, FROM_UNIXTIME(post_time) as pt from Vw_Topic v";
 //			String cmd = "select v.*, FROM_UNIXTIME(topic_time) as frang from Vw_Topic2 v where v.topic_id=1797";
 //			String cmd = "select v.*, FROM_UNIXTIME(topic_time) as frang from Vw_Topic2 v where v.topic_id=1805";
 			preStatement = conn.prepareStatement(cmd);
@@ -84,10 +84,20 @@ public class ImportTopic {
 				TopicModel topicModel = new TopicModel();
 				
 				topicModel.setDesc(rSet.getString("post_subject"));
-				topicModel.setEmail("");
+				topicModel.setEmail(rSet.getString("user_email"));
 				topicModel.setFileName("");
 				topicModel.setForumId(rSet.getInt("forum_id"));
-				topicModel.setIp("");
+				String ip = "";
+				if(rSet.getString("poster_ip") != null || rSet.getString("poster_ip").trim().length() > 0) {
+					String ip_enc = rSet.getString("poster_ip");
+					String ip1 = ip_enc.substring(0, 2);
+					String ip2 = ip_enc.substring(2, 4);
+					String ip3 = ip_enc.substring(4, 6);
+					String ip4 = ip_enc.substring(6, 8);
+					ip = Integer.valueOf(ip1, 16)+"."+Integer.valueOf(ip2, 16)+"."+Integer.valueOf(ip3, 16)+"."+Integer.valueOf(ip4, 16);
+					System.out.println(ip);
+				}
+				topicModel.setIp(ip);
 				topicModel.setMessage(rSet.getString("post_subject"));
 				topicModel.setMessageClob(wbtiMessage);
 				topicModel.setPath("");
@@ -99,7 +109,6 @@ public class ImportTopic {
 				topicModel.setTopicTitle(rSet.getString("topic_title"));
 				topicModel.setStatusPermission("1");
 				topicModel.setStatusNotify("0");
-				topicModel.setLastReplyTime(new Date());
 				
 				if(rSet.getString("post_username") != null && rSet.getString("post_username").trim().length() > 0) {
 					topicModel.setUserCreated(rSet.getString("post_username"));
@@ -114,9 +123,18 @@ public class ImportTopic {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				Date date2 = null;
+				try {
+					date2 = format.parse(rSet.getString("pt"));
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 				topicModel.setCreatedTime(date);
 				topicModel.setUpdatedTime(date);
-				topicModel.setLastReplyTime(date);
+				topicModel.setLastReplyTime(date2);
 				topicModel.setUsernameLdap("");
 				topicModel.setViews(rSet.getString("topic_views"));
 				Viewlist.add(topicModel);

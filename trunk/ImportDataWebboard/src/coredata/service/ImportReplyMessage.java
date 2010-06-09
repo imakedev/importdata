@@ -44,7 +44,7 @@ public class ImportReplyMessage {
 
 			System.out.println(conn);
 			String cmd = "select v.*, FROM_UNIXTIME(post_time) as pt, FROM_UNIXTIME(post_edit_time) as et from vw_reply v";
-
+//			String cmd = "select v.*, FROM_UNIXTIME(post_time) as pt, FROM_UNIXTIME(post_edit_time) as et from vw_reply v where v.post_id=146";
 			preStatement = conn.prepareStatement(cmd);
 
 			rSet = preStatement.executeQuery();
@@ -78,8 +78,20 @@ public class ImportReplyMessage {
 //				System.out.println("wbtiMessage ==> "+wbtiMessage);
 //				System.out.println("wbtiMessage2 ==> "+rSet.getString("post_text"));
 				replyModel.setCreatedTime(post_date);
-				replyModel.setEmail("");
-				replyModel.setIp(rSet.getString("poster_ip"));
+				replyModel.setEmail(rSet.getString("user_email"));
+				
+				String ip = "";
+				if(rSet.getString("poster_ip") != null || rSet.getString("poster_ip").trim().length() > 0) {
+					String ip_enc = rSet.getString("poster_ip");
+					String ip1 = ip_enc.substring(0, 2);
+					String ip2 = ip_enc.substring(2, 4);
+					String ip3 = ip_enc.substring(4, 6);
+					String ip4 = ip_enc.substring(6, 8);
+					ip = Integer.valueOf(ip1, 16)+"."+Integer.valueOf(ip2, 16)+"."+Integer.valueOf(ip3, 16)+"."+Integer.valueOf(ip4, 16);
+					System.out.println(ip);
+				}
+				
+				replyModel.setIp(ip);
 				replyModel.setMessage(rSet.getString("post_subject"));
 				replyModel.setPath("");
 				replyModel.setPostId(rSet.getInt("post_id"));
@@ -158,7 +170,7 @@ public class ImportReplyMessage {
 	public static void main(String[] args) {
 		List list = viewReport();
 		System.out.println(list.size());
-		sendData(list);
+//		sendData(list);
 		
 		
 	}

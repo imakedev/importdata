@@ -82,7 +82,7 @@ public class ImportTopic {
 				
 //				String wbtiMessage = rSet.getString("post_text");
 				TopicModel topicModel = new TopicModel();
-				topicModel.setCreatedTime(new Date(new Long(rSet.getInt("topic_time")).longValue()));
+				
 				topicModel.setDesc(rSet.getString("post_subject"));
 				topicModel.setEmail("");
 				topicModel.setFileName("");
@@ -98,7 +98,7 @@ public class ImportTopic {
 				topicModel.setTopicId(rSet.getInt("topic_id"));
 				topicModel.setTopicTitle(rSet.getString("topic_title"));
 				topicModel.setStatusPermission("1");
-				topicModel.setStatusNotify("");
+				topicModel.setStatusNotify("0");
 				topicModel.setLastReplyTime(new Date());
 				
 				if(rSet.getString("post_username") != null && rSet.getString("post_username").trim().length() > 0) {
@@ -114,7 +114,9 @@ public class ImportTopic {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				topicModel.setCreatedTime(date);
 				topicModel.setUpdatedTime(date);
+				topicModel.setLastReplyTime(date);
 				topicModel.setUsernameLdap("");
 				topicModel.setViews(rSet.getString("topic_views"));
 				Viewlist.add(topicModel);
